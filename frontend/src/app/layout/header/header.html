@@ -3,64 +3,25 @@
     <div
       class="flex w-full items-center justify-between border-b border-gray-200 py-6 lg:border-none"
     >
-      <div class="flex items-center">
+      <div class="flex items-center" id="app-title-bar">
         <a routerLink="/" class="text-2xl font-bold text-indigo-600"> LedgerLens </a>
-        <div class="ml-10 hidden space-x-8 lg:block">
+        <div class="ml-10 hidden space-x-8 sm:block" id="nav-links">
+          @for (item of items; track item.label) {
           <a
-            routerLink="/dashboard"
+            [routerLink]="item.routerLink"
             routerLinkActive="text-indigo-600 font-semibold"
             class="text-base font-medium text-gray-500 hover:text-gray-900"
-            >總覽看板</a
+            >{{ item.label }}</a
           >
-          <a
-            routerLink="/transactions"
-            routerLinkActive="text-indigo-600 font-semibold"
-            class="text-base font-medium text-gray-500 hover:text-gray-900"
-            >交易明細</a
-          >
-          <a
-            routerLink="/analysis"
-            routerLinkActive="text-indigo-600 font-semibold"
-            class="text-base font-medium text-gray-500 hover:text-gray-900"
-            >AI 趨勢分析</a
-          >
-          <a
-            routerLink="/smart-search"
-            routerLinkActive="text-indigo-600 font-semibold"
-            class="text-base font-medium text-gray-500 hover:text-gray-900"
-            >AI 智慧搜尋</a
-          >
+          }
         </div>
       </div>
-      <div class="ml-10 space-x-4">
-        <!-- Placeholder for future user actions or settings -->
+      <div class="ml-10 space-x-4 flex items-center">
+        <div class="block sm:hidden">
+          <p-button icon="pi pi-bars" [text]="true" (onClick)="menu.toggle($event)"></p-button>
+          <p-menu #menu [model]="items" [popup]="true"></p-menu>
+        </div>
       </div>
-    </div>
-    <div class="flex flex-wrap justify-center space-x-6 py-4 lg:hidden">
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="text-indigo-600 font-semibold"
-        class="text-base font-medium text-gray-500 hover:text-gray-900"
-        >總覽看板</a
-      >
-      <a
-        routerLink="/transactions"
-        routerLinkActive="text-indigo-600 font-semibold"
-        class="text-base font-medium text-gray-500 hover:text-gray-900"
-        >交易明細</a
-      >
-      <a
-        routerLink="/analysis"
-        routerLinkActive="text-indigo-600 font-semibold"
-        class="text-base font-medium text-gray-500 hover:text-gray-900"
-        >AI 趨勢分析</a
-      >
-      <a
-        routerLink="/smart-search"
-        routerLinkActive="text-indigo-600 font-semibold"
-        class="text-base font-medium text-gray-500 hover:text-gray-900"
-        >AI 智慧搜尋</a
-      >
     </div>
   </nav>
 </header>
