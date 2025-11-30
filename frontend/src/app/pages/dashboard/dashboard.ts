@@ -3,6 +3,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,8 +16,8 @@ export class Dashboard {
   private transactionService = inject(TransactionService);
   
   // 當前年份與月份 (預設為當前時間)
-  currentYear = signal(new Date().getFullYear());
-  currentMonth = signal(new Date().getMonth() + 1); // 1-12
+  currentYear = signal(dayjs().year());
+  currentMonth = signal(dayjs().month() + 1); // 1-12
 
   // 取得所有交易
   transactions = this.transactionService.transactions;

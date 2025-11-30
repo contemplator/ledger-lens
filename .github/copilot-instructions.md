@@ -20,6 +20,7 @@ ledger-lens/
 - **UI Library**: PrimeNG. Use PrimeNG components for tables, dialogs, and charts.
 - **Styling**: Tailwind CSS. Use utility classes directly in HTML. Avoid creating custom CSS files unless absolutely necessary.
 - **Language**: TypeScript (Strict mode).
+- **Date Handling**: Use **dayjs** for all date and time manipulations. Avoid using native `Date` object directly.
 
 ## Technology Stack
 
