@@ -1,0 +1,11 @@
+{
+  "name": "ledger-lens",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "個人記帳紀錄分析，預計透過匯入天天記帳 App 來進行分析，使用 AI API 進行提問"
+}
