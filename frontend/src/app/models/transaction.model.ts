@@ -12,3 +12,9 @@ export interface Transaction {
   lastUpdated: string;   // 上次更新
   uuid: string;          // UUID
 }
+
+export interface MonthlySummary {
+  month: string;
+  totalExpense: number;
+  categoryBreakdown: Record<string, number>;
+}

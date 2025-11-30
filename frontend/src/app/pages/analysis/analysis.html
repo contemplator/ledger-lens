@@ -1,1 +1,155 @@
-<p>analysis works!</p>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+  <p-toast></p-toast>
+
+  <!-- Menu View -->
+  @if (currentView() === 'menu') {
+    <div class="max-w-3xl mx-auto">
+      <p-card styleClass="mb-8 shadow-lg">
+        <ng-template pTemplate="header">
+          <div class="bg-indigo-600 h-2 rounded-t-lg"></div>
+        </ng-template>
+        <div class="flex items-start gap-4">
+          <div class="p-3 bg-indigo-50 rounded-full">
+            <i class="pi pi-sparkles text-indigo-600 text-2xl"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">AI 智慧分析</h2>
+            <p class="text-gray-600 leading-relaxed">
+              透過 Gemini AI 的強大運算能力，深入分析您的消費習慣。我們提供多維度的財務洞察，協助您找出潛在的節流機會，達成理財目標。
+            </p>
+          </div>
+        </div>
+      </p-card>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- MoM Analysis Button -->
+        <div 
+          (click)="onMomClick()"
+          class="group cursor-pointer bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-300 transition-all duration-200"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+              <i class="pi pi-chart-bar text-blue-600 text-xl"></i>
+            </div>
+            <i class="pi pi-arrow-right text-gray-300 group-hover:text-blue-500 transition-colors"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">月環比分析</h3>
+          <p class="text-sm text-gray-500">
+            比較本月與上個月的收支變化，掌握短期消費趨勢。
+          </p>
+        </div>
+
+        <!-- YoY Analysis Button -->
+        <div 
+          (click)="onYoyClick()"
+          class="group cursor-pointer bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-purple-300 transition-all duration-200"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-2 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
+              <i class="pi pi-calendar text-purple-600 text-xl"></i>
+            </div>
+            <i class="pi pi-arrow-right text-gray-300 group-hover:text-purple-500 transition-colors"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">年同比分析</h3>
+          <p class="text-sm text-gray-500">
+            比較今年與去年同期的財務狀況，檢視長期理財成效。
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MoM Analysis View -->
+  @if (currentView() === 'mom') {
+    <div class="max-w-4xl mx-auto">
+      <button 
+        pButton 
+        icon="pi pi-arrow-left" 
+        label="返回選單" 
+        class="p-button-text mb-6"
+        (click)="onBackClick()"
+      ></button>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">月環比分析</h2>
+            <p class="text-sm text-gray-500 mt-1">
+              {{ momAnalysis().lastMonthLabel }} vs {{ momAnalysis().currentMonthLabel }}
+            </p>
+          </div>
+          <div class="px-3 py-1 rounded-full text-sm font-medium"
+            [class.bg-red-100]="momAnalysis().isIncrease"
+            [class.text-red-700]="momAnalysis().isIncrease"
+            [class.bg-green-100]="!momAnalysis().isIncrease"
+            [class.text-green-700]="!momAnalysis().isIncrease"
+          >
+            {{ momAnalysis().isIncrease ? '支出增加' : '支出減少' }}
+          </div>
+        </div>
+
+        <div class="p-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <!-- Last Month -->
+            <div>
+              <p class="text-sm text-gray-500 mb-1">上月支出</p>
+              <p class="text-2xl font-bold text-gray-900">{{ momAnalysis().lastTotal | number }}</p>
+            </div>
+
+            <!-- Current Month -->
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 w-px bg-gray-200 hidden md:block"></div>
+              <p class="text-sm text-gray-500 mb-1">本月支出</p>
+              <p class="text-2xl font-bold text-gray-900">{{ momAnalysis().currentTotal | number }}</p>
+              <div class="absolute inset-y-0 right-0 w-px bg-gray-200 hidden md:block"></div>
+            </div>
+
+            <!-- Difference -->
+            <div>
+              <p class="text-sm text-gray-500 mb-1">差異金額</p>
+              <div class="flex items-center justify-center gap-2">
+                <p class="text-2xl font-bold"
+                  [class.text-red-600]="momAnalysis().isIncrease"
+                  [class.text-green-600]="!momAnalysis().isIncrease"
+                >
+                  {{ momAnalysis().diff > 0 ? '+' : '' }}{{ momAnalysis().diff | number }}
+                </p>
+                <span class="text-sm font-medium px-2 py-0.5 rounded"
+                  [class.bg-red-100]="momAnalysis().isIncrease"
+                  [class.text-red-700]="momAnalysis().isIncrease"
+                  [class.bg-green-100]="!momAnalysis().isIncrease"
+                  [class.text-green-700]="!momAnalysis().isIncrease"
+                >
+                  {{ momAnalysis().percentChange | number:'1.1-1' }}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Insight Section -->
+          <div class="mt-10 bg-indigo-50 rounded-lg p-6 border border-indigo-100">
+            <div class="flex items-start gap-3">
+              <i class="pi pi-sparkles text-indigo-600 mt-1 text-xl"></i>
+              <div class="w-full">
+                <h4 class="font-semibold text-indigo-900 mb-2">AI 智慧洞察</h4>
+                
+                @if (isLoading()) {
+                  <div class="flex items-center gap-2 text-indigo-700 py-4">
+                    <i class="pi pi-spin pi-spinner text-xl"></i>
+                    <span>Gemini 正在分析您的消費數據...</span>
+                  </div>
+                } @else if (analysisResult()) {
+                  <div class="prose prose-indigo max-w-none text-indigo-900 text-sm leading-relaxed">
+                    <markdown [data]="analysisResult()"></markdown>
+                  </div>
+                } @else {
+                  <p class="text-indigo-800 text-sm">無法取得分析結果。</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
