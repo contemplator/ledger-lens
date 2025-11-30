@@ -12,5 +12,4 @@ import { Footer } from './layout/footer/footer';
   styles: []
 })
 export class App {
-  protected readonly title = signal('ledger-lens');
 }

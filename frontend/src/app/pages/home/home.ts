@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FileDropzone } from '../../components/file-dropzone/file-dropzone';
+import { AppConfig } from '../../services/app-config';
 
 @Component({
   selector: 'app-home',
@@ -8,5 +9,6 @@ import { FileDropzone } from '../../components/file-dropzone/file-dropzone';
   styleUrl: './home.css',
 })
 export class Home {
-
+  private configService = inject(AppConfig);
+  appName = this.configService.appName;
 }

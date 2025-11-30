@@ -4,7 +4,7 @@
       class="flex w-full items-center justify-between border-b border-gray-200 py-6 lg:border-none"
     >
       <div class="flex items-center" id="app-title-bar">
-        <a routerLink="/" class="text-2xl font-bold text-indigo-600"> LedgerLens </a>
+        <a routerLink="/" class="text-2xl font-bold text-indigo-600">{{ appName() }} </a>
         <div class="ml-10 hidden space-x-8 sm:block" id="nav-links">
           @for (item of items; track item.label) {
           <a
