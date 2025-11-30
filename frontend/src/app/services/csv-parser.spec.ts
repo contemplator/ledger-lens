@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CsvParser } from './csv-parser';
+import { CsvParserService } from './csv-parser.service';
 
-describe('CsvParser', () => {
-  let service: CsvParser;
+describe('CsvParserService', () => {
+  let service: CsvParserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CsvParser);
+    service = TestBed.inject(CsvParserService);
   });
 
   it('should be created', () => {
