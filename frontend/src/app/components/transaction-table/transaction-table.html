@@ -1,1 +1,53 @@
-<p>transaction-table works!</p>
+<div class="card">
+  <p-table
+    [value]="transactions()"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    class="p-datatable-sm p-datatable-striped"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 15%">日期</th>
+        <th style="width: 10%">收支</th>
+        <th style="width: 15%">類別</th>
+        <th style="width: 15%">金額</th>
+        <th style="width: 15%">帳戶</th>
+        <th style="width: 30%">備註</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-transaction>
+      <tr>
+        <td>{{ transaction.date }}</td>
+        <td>
+          <span
+            class="px-2 py-1 rounded text-xs font-medium"
+            [class.bg-green-100]="transaction.type === '收'"
+            [class.text-green-800]="transaction.type === '收'"
+            [class.bg-red-100]="transaction.type === '支'"
+            [class.text-red-800]="transaction.type === '支'"
+            [class.bg-gray-100]="transaction.type === '轉'"
+            [class.text-gray-800]="transaction.type === '轉'"
+          >
+            {{ transaction.type }}
+          </span>
+        </td>
+        <td>{{ transaction.category }}</td>
+        <td
+          [class.text-green-600]="transaction.type === '收'"
+          [class.text-red-600]="transaction.type === '支'"
+          class="font-medium"
+        >
+          {{ transaction.amount | number }}
+        </td>
+        <td>{{ transaction.account }}</td>
+        <td class="text-gray-500">{{ transaction.note }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center py-8 text-gray-500">沒有找到相關交易紀錄</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
