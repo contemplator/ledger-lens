@@ -59,6 +59,7 @@ ng generate --help                      # List all available schematics
 ### Component Structure
 - **Naming**: Use `App` class name pattern (not `AppComponent`)
 - **Selectors**: Use `app-` prefix (configured in `angular.json`)
+- **Separation of Concerns**: Always edit the corresponding `.html` and `.css` files for UI changes. Do not use inline `template` or `styles` in the `.ts` file.
 - **Signals**: Protect signal properties with `protected readonly` modifier
   ```typescript
   protected readonly title = signal('ledger-lens');
