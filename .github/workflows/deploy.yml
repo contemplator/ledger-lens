@@ -78,7 +78,7 @@ jobs:
           # 2. 移動檔案到正式目錄
           # Frontend
           sudo rm -rf /var/www/ledger-lens/frontend/*
-          sudo cp -r /var/www/ledger-lens_temp/frontend/dist/frontend/* /var/www/ledger-lens/frontend/
+          sudo cp -r /var/www/ledger-lens_temp/frontend/dist/ledger-lens/* /var/www/ledger-lens/frontend/
           
           # Backend
           # sudo cp /var/www/ledger-lens_temp/backend/server /var/www/ledger-lens/backend/
