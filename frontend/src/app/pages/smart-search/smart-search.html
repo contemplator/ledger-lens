@@ -1,1 +1,94 @@
-<p>smart-search works!</p>
+<div class="flex flex-col h-[calc(100vh-140px)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+  <!-- Chat Area -->
+  <div #chatContainer class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50">
+    @for (msg of messages(); track $index) {
+      <div class="flex" [class.justify-end]="msg.role === 'user'" [class.justify-start]="msg.role === 'ai'">
+        <div class="flex gap-3 max-w-[90%] md:max-w-[80%]" [class.flex-row-reverse]="msg.role === 'user'">
+          <!-- Avatar -->
+          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            [class.bg-indigo-600]="msg.role === 'ai'"
+            [class.text-white]="msg.role === 'ai'"
+            [class.bg-gray-300]="msg.role === 'user'"
+            [class.text-gray-600]="msg.role === 'user'">
+            @if (msg.role === 'ai') {
+              <i class="pi pi-android text-xl"></i>
+            } @else {
+              <i class="pi pi-user text-xl"></i>
+            }
+          </div>
+          
+          <div class="space-y-3 w-full">
+            <!-- Message Bubble -->
+            <div class="p-4 rounded-2xl text-sm leading-relaxed shadow-sm overflow-hidden"
+              [class.bg-indigo-600]="msg.role === 'user'"
+              [class.text-white]="msg.role === 'user'"
+              [class.rounded-tr-none]="msg.role === 'user'"
+              [class.bg-white]="msg.role === 'ai'"
+              [class.text-gray-800]="msg.role === 'ai'"
+              [class.rounded-tl-none]="msg.role === 'ai'"
+              [class.border]="msg.role === 'ai'"
+              [class.border-gray-100]="msg.role === 'ai'">
+              
+              @if (msg.role === 'ai') {
+                <div class="prose prose-sm prose-indigo max-w-none">
+                  <markdown [data]="msg.content"></markdown>
+                </div>
+              } @else {
+                {{ msg.content }}
+              }
+            </div>
+
+            <!-- Transaction Preview Cards -->
+            @if (msg.relatedTransactions && msg.relatedTransactions.length > 0) {
+              <div class="space-y-2 max-w-sm">
+                <p class="text-xs text-gray-500 ml-1">相關紀錄 (預覽前 5 筆):</p>
+                @for (t of msg.relatedTransactions; track t.uuid) {
+                  <div class="bg-white border border-gray-200 p-3 rounded-lg flex justify-between items-center text-xs shadow-sm">
+                    <div>
+                      <div class="font-bold text-gray-700">{{ t.category }}</div>
+                      <div class="text-gray-400">{{ formatDate(t.date) }} · {{ t.note }}</div>
+                    </div>
+                    <div class="font-bold" [class.text-red-500]="t.type === '支'" [class.text-green-500]="t.type === '收'">
+                      {{ t.type === '支' ? '-' : '+' }}{{ t.amount | number }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Loading Indicator -->
+    @if (isProcessing()) {
+      <div class="flex justify-start">
+        <div class="bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 flex items-center gap-2">
+          <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
+          <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-75"></div>
+          <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-150"></div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Input Area -->
+  <div class="p-4 bg-white border-t border-gray-100">
+    <div class="relative flex items-center">
+      <input
+        type="text"
+        class="w-full bg-gray-50 border border-gray-200 rounded-full py-3 pl-5 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
+        placeholder="輸入您的問題，例如：比較 10 月和 11 月的支出差異？"
+        [(ngModel)]="query"
+        [disabled]="isProcessing()"
+      />
+      <button 
+        (click)="handleSearch()"
+        [disabled]="isProcessing()"
+        class="absolute right-2 p-2 bg-indigo-600 rounded-full text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+      >
+        <i class="pi pi-send text-sm"></i>
+      </button>
+    </div>
+  </div>
+</div>
