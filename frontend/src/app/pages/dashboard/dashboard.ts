@@ -19,6 +19,26 @@ export class Dashboard {
   currentYear = signal(dayjs().year());
   currentMonth = signal(dayjs().month() + 1); // 1-12
 
+  // 切換到上個月
+  prevMonth() {
+    if (this.currentMonth() === 1) {
+      this.currentYear.update(y => y - 1);
+      this.currentMonth.set(12);
+    } else {
+      this.currentMonth.update(m => m - 1);
+    }
+  }
+
+  // 切換到下個月
+  nextMonth() {
+    if (this.currentMonth() === 12) {
+      this.currentYear.update(y => y + 1);
+      this.currentMonth.set(1);
+    } else {
+      this.currentMonth.update(m => m + 1);
+    }
+  }
+
   // 取得所有交易
   transactions = this.transactionService.transactions;
 

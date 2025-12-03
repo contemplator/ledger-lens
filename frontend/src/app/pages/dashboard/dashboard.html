@@ -2,8 +2,14 @@
   <div class="flex items-center justify-between mb-8">
     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">總覽看板</h2>
     <div class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+      <button (click)="prevMonth()" class="p-1 hover:bg-gray-100 rounded-full transition-colors mr-2 focus:outline-none" aria-label="上個月">
+        <i class="pi pi-chevron-left text-gray-600 text-sm"></i>
+      </button>
       <i class="pi pi-calendar text-indigo-600 mr-2"></i>
-      <span class="text-lg font-semibold text-gray-700">{{ currentYear() }} 年 {{ currentMonth() }} 月</span>
+      <span class="text-lg font-semibold text-gray-700 min-w-24 text-center">{{ currentYear() }} 年 {{ currentMonth() }} 月</span>
+      <button (click)="nextMonth()" class="p-1 hover:bg-gray-100 rounded-full transition-colors ml-2 focus:outline-none" aria-label="下個月">
+        <i class="pi pi-chevron-right text-gray-600 text-sm"></i>
+      </button>
     </div>
   </div>
 
