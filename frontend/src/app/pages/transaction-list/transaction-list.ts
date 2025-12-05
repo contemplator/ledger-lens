@@ -11,6 +11,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { CardModule } from 'primeng/card';
 import dayjs from 'dayjs';
 
 @Component({
@@ -28,6 +30,8 @@ import dayjs from 'dayjs';
     MultiSelectModule,
     DatePickerModule,
     InputNumberModule,
+    RadioButtonModule,
+    CardModule,
   ],
   templateUrl: './transaction-list.html',
   styleUrl: './transaction-list.css',
@@ -55,6 +59,46 @@ export class TransactionList {
   endDate = signal<Date | null>(null);
   minAmount = signal<number | null>(null);
   maxAmount = signal<number | null>(null);
+  datePreset = signal<string>('');
+
+  // 日期預設選項
+  datePresets = [
+    { label: '本月', value: 'thisMonth' },
+    { label: '上個月', value: 'lastMonth' },
+    { label: '近兩個月', value: 'recent2Months' },
+    { label: '今年', value: 'thisYear' },
+  ];
+
+  applyDatePreset(preset: string) {
+    this.datePreset.set(preset);
+    const now = dayjs();
+    let start: dayjs.Dayjs;
+    let end: dayjs.Dayjs;
+
+    switch (preset) {
+      case 'thisMonth':
+        start = now.startOf('month');
+        end = now.endOf('month');
+        break;
+      case 'lastMonth':
+        start = now.subtract(1, 'month').startOf('month');
+        end = now.subtract(1, 'month').endOf('month');
+        break;
+      case 'recent2Months':
+        start = now.subtract(1, 'month').startOf('month');
+        end = now.endOf('month');
+        break;
+      case 'thisYear':
+        start = now.startOf('year');
+        end = now.endOf('year');
+        break;
+      default:
+        return;
+    }
+
+    this.startDate.set(start.toDate());
+    this.endDate.set(end.toDate());
+  }
 
   // 分類選項 (從現有交易中提取，並按類型分組)
   categoryOptions = computed(() => {
@@ -111,24 +155,45 @@ export class TransactionList {
     }
 
     // 日期範圍 (交易日期格式為 YYYYMMDD)
-    if (this.startDate()) {
-      const startStr = dayjs(this.startDate()).format('YYYYMMDD');
-      result = result.filter(t => t.date >= startStr);
-    }
-    if (this.endDate()) {
-      const endStr = dayjs(this.endDate()).format('YYYYMMDD');
-      result = result.filter(t => t.date <= endStr);
+    const start = this.startDate();
+    const end = this.endDate();
+    if (start || end) {
+      result = result.filter((t) => {
+        const date = dayjs(t.date);
+        if (start && date.isBefore(dayjs(start), 'day')) return false;
+        if (end && date.isAfter(dayjs(end), 'day')) return false;
+        return true;
+      });
     }
 
     // 金額範圍
-    if (this.minAmount() !== null) {
-      result = result.filter(t => t.amount >= this.minAmount()!);
+    const min = this.minAmount();
+    const max = this.maxAmount();
+    if (min !== null) {
+      result = result.filter((t) => t.amount >= min);
     }
-    if (this.maxAmount() !== null) {
-      result = result.filter(t => t.amount <= this.maxAmount()!);
+    if (max !== null) {
+      result = result.filter((t) => t.amount <= max);
     }
 
     return result;
+  });
+
+  // 統計數據
+  totalIncome = computed(() => {
+    return this.filteredTransactions()
+      .filter(t => t.type === '收')
+      .reduce((sum, t) => sum + t.amount, 0);
+  });
+
+  totalExpense = computed(() => {
+    return this.filteredTransactions()
+      .filter(t => t.type === '支')
+      .reduce((sum, t) => sum + t.amount, 0);
+  });
+
+  totalBalance = computed(() => {
+    return this.totalIncome() - this.totalExpense();
   });
 
   toggleAdvancedFilters() {

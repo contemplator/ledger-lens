@@ -1,7 +1,7 @@
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <!-- 篩選器區塊 -->
   <div class="mb-6">
-    <div class="flex justify-between sm:flex-row gap-4">
+    <div class="flex flex-wrap justify-between sm:flex-row gap-4">
       <div class="w-full sm:w-1/3">
         <p-iconField iconPosition="left">
           <p-inputIcon class="pi pi-search" />
@@ -14,111 +14,174 @@
           />
         </p-iconField>
       </div>
-      
+
       <!-- Toggle Button -->
       <div class="flex gap-2">
-          <p-button 
-            [label]="showAdvancedFilters() ? '隱藏進階篩選' : '進階篩選'" 
-            [icon]="showAdvancedFilters() ? 'pi pi-filter-slash' : 'pi pi-filter'" 
-            (onClick)="toggleAdvancedFilters()"
-            styleClass="p-button-outlined">
-          </p-button>
-          <p-button 
-            label="清除" 
-            icon="pi pi-times" 
-            (onClick)="clearFilters()"
-            styleClass="p-button-outlined p-button-secondary">
-          </p-button>
+        <p-button
+          [label]="showAdvancedFilters() ? '隱藏進階篩選' : '進階篩選'"
+          [icon]="showAdvancedFilters() ? 'pi pi-filter-slash' : 'pi pi-filter'"
+          (onClick)="toggleAdvancedFilters()"
+          styleClass="p-button-outlined"
+        >
+        </p-button>
+        <p-button
+          label="清除"
+          icon="pi pi-times"
+          (onClick)="clearFilters()"
+          styleClass="p-button-outlined p-button-secondary"
+        >
+        </p-button>
       </div>
     </div>
 
     <!-- Advanced Filters Panel -->
     @if (showAdvancedFilters()) {
-        <div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <!-- Type -->
-            <div class="flex flex-col gap-2">
-                <label class="text-sm font-medium text-gray-700">交易類型</label>
-                <p-selectButton 
-                    [options]="typeOptions" 
-                    [(ngModel)]="selectedType" 
-                    optionLabel="label" 
-                    optionValue="value">
-                </p-selectButton>
-            </div>
+    <div
+      class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4"
+    >
+      <!-- Type -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-gray-700">交易類型</label>
+        <p-selectButton
+          [options]="typeOptions"
+          [(ngModel)]="selectedType"
+          optionLabel="label"
+          optionValue="value"
+        >
+        </p-selectButton>
+      </div>
 
-            <!-- Category -->
-            <div class="flex flex-col gap-2">
-                <label class="text-sm font-medium text-gray-700">分類</label>
-                <p-multiSelect 
-                    [options]="categoryOptions()" 
-                    [(ngModel)]="selectedCategories" 
-                    defaultLabel="選擇分類" 
-                    [group]="true"
-                    optionGroupLabel="label"
-                    optionGroupChildren="items"
-                    optionLabel="label" 
-                    optionValue="value"
-                    display="chip"
-                    [style]="{'width':'100%'}">
-                </p-multiSelect>
-            </div>
+      <!-- Category -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-gray-700">分類</label>
+        <p-multiSelect
+          [options]="categoryOptions()"
+          [(ngModel)]="selectedCategories"
+          defaultLabel="選擇分類"
+          [group]="true"
+          optionGroupLabel="label"
+          optionGroupChildren="items"
+          optionLabel="label"
+          optionValue="value"
+          display="chip"
+          [style]="{ width: '100%' }"
+        >
+        </p-multiSelect>
+      </div>
 
-            <!-- Date Range -->
-            <div class="flex flex-col gap-2 md:col-span-2 lg:col-span-1">
-                <label class="text-sm font-medium text-gray-700">日期範圍</label>
-                <div class="flex gap-2 items-center">
-                    <div class="flex-1 min-w-0">
-                        <p-datepicker 
-                            [(ngModel)]="startDate" 
-                            placeholder="開始日期" 
-                            dateFormat="yy/mm/dd" 
-                            [showIcon]="true"
-                            styleClass="w-full"
-                            [inputStyle]="{'width':'100%'}">
-                        </p-datepicker>
-                    </div>
-                    <span class="text-gray-400 shrink-0">-</span>
-                    <div class="flex-1 min-w-0">
-                        <p-datepicker 
-                            [(ngModel)]="endDate" 
-                            placeholder="結束日期" 
-                            dateFormat="yy/mm/dd" 
-                            [showIcon]="true"
-                            styleClass="w-full"
-                            [inputStyle]="{'width':'100%'}">
-                        </p-datepicker>
-                    </div>
-                </div>
+      <!-- Date Range -->
+      <div class="flex flex-col gap-2 md:col-span-2 lg:col-span-1">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <label class="text-sm font-medium text-gray-700">日期範圍</label>
+          <div class="flex flex-wrap gap-3">
+            @for (preset of datePresets; track preset.value) {
+            <div class="flex items-center gap-1">
+              <p-radioButton
+                name="datePreset"
+                [value]="preset.value"
+                [ngModel]="datePreset()"
+                (onClick)="applyDatePreset(preset.value)"
+                inputId="preset-{{ preset.value }}"
+              >
+              </p-radioButton>
+              <label for="preset-{{ preset.value }}" class="text-sm text-gray-600 cursor-pointer">{{
+                preset.label
+              }}</label>
             </div>
-
-            <!-- Amount Range -->
-            <div class="flex flex-col gap-2 md:col-span-2 lg:col-span-1">
-                <label class="text-sm font-medium text-gray-700">金額範圍</label>
-                <div class="flex gap-2 items-center">
-                    <p-inputNumber 
-                        [(ngModel)]="minAmount" 
-                        placeholder="最小" 
-                        mode="currency" 
-                        currency="TWD" 
-                        locale="zh-TW"
-                        [minFractionDigits]="0"
-                        styleClass="w-full">
-                    </p-inputNumber>
-                    <span class="text-gray-400">-</span>
-                    <p-inputNumber 
-                        [(ngModel)]="maxAmount" 
-                        placeholder="最大" 
-                        mode="currency" 
-                        currency="TWD" 
-                        locale="zh-TW"
-                        [minFractionDigits]="0"
-                        styleClass="w-full">
-                    </p-inputNumber>
-                </div>
-            </div>
+            }
+          </div>
         </div>
+        <div class="flex gap-2 items-center">
+          <div class="flex-1 min-w-0">
+            <p-datepicker
+              [(ngModel)]="startDate"
+              placeholder="開始日期"
+              dateFormat="yy/mm/dd"
+              [showIcon]="true"
+              [inputStyle]="{ width: '100%' }"
+            >
+            </p-datepicker>
+          </div>
+          <span class="text-gray-400 shrink-0">-</span>
+          <div class="flex-1 min-w-0">
+            <p-datepicker
+              [(ngModel)]="endDate"
+              placeholder="結束日期"
+              dateFormat="yy/mm/dd"
+              [showIcon]="true"
+              [inputStyle]="{ width: '100%' }"
+            >
+            </p-datepicker>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amount Range -->
+      <div class="flex flex-col gap-2 md:col-span-2 lg:col-span-1">
+        <label class="text-sm font-medium text-gray-700">金額範圍</label>
+        <div class="flex gap-2 items-center">
+          <div class="flex-1 min-w-0">
+            <p-inputNumber
+              [(ngModel)]="minAmount"
+              placeholder="最小"
+              mode="currency"
+              currency="TWD"
+              locale="zh-TW"
+              [minFractionDigits]="0"
+              [inputStyle]="{ width: '100%' }"
+            >
+            </p-inputNumber>
+          </div>
+
+          <span class="text-gray-400">-</span>
+          <div class="flex-1 min-w-0">
+            <p-inputNumber
+              [(ngModel)]="maxAmount"
+              placeholder="最大"
+              mode="currency"
+              currency="TWD"
+              locale="zh-TW"
+              [minFractionDigits]="0"
+              [inputStyle]="{ width: '100%' }"
+            >
+            </p-inputNumber>
+          </div>
+        </div>
+      </div>
+    </div>
     }
+  </div>
+
+  <!-- 統計卡片 -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <p-card styleClass="bg-red-50 border-red-100 shadow-sm">
+      <div class="flex flex-col gap-1">
+        <span class="text-sm text-gray-600">總支出</span>
+        <span class="text-2xl font-bold text-red-600">{{
+          totalExpense() | currency : 'TWD' : 'symbol' : '1.0-0'
+        }}</span>
+      </div>
+    </p-card>
+    <p-card styleClass="bg-green-50 border-green-100 shadow-sm">
+      <div class="flex flex-col gap-1">
+        <span class="text-sm text-gray-600">總收入</span>
+        <span class="text-2xl font-bold text-green-600">{{
+          totalIncome() | currency : 'TWD' : 'symbol' : '1.0-0'
+        }}</span>
+      </div>
+    </p-card>
+    <p-card styleClass="bg-blue-50 border-blue-100 shadow-sm">
+      <div class="flex flex-col gap-1">
+        <span class="text-sm text-gray-600">淨收益</span>
+        <span
+          class="text-2xl font-bold"
+          [class.text-green-600]="totalBalance() >= 0"
+          [class.text-red-600]="totalBalance() < 0"
+        >
+          {{ totalBalance() | currency : 'TWD' : 'symbol' : '1.0-0' }}
+        </span>
+      </div>
+    </p-card>
   </div>
 
   <!-- 交易表格 -->
