@@ -19,7 +19,7 @@
       <div class="ml-10 space-x-4 flex items-center">
         <div class="block sm:hidden">
           <p-button icon="pi pi-bars" [text]="true" (onClick)="menu.toggle($event)"></p-button>
-          <p-menu #menu [model]="items" [popup]="true"></p-menu>
+          <p-menu #menu [model]="items" [popup]="true" [appendTo]="'body'"></p-menu>
         </div>
       </div>
     </div>
