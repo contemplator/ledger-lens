@@ -1,23 +1,44 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { TransactionService } from '../../services/transaction.service';
 import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { FileDropzone } from '../../components/file-dropzone/file-dropzone';
 import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ChartModule, CardModule],
+  imports: [CommonModule, ChartModule, CardModule, DialogModule, ButtonModule, FileDropzone],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
   private transactionService = inject(TransactionService);
+  
+  // 上傳對話框顯示狀態
+  showUploadDialog = signal(false);
   
   // 當前年份與月份 (預設為當前時間)
   currentYear = signal(dayjs().year());
   currentMonth = signal(dayjs().month() + 1); // 1-12
+
+  ngOnInit() {
+    // 載入交易資料
+    this.transactionService.loadTransactions().subscribe(response => {
+      if (!response.transactions || response.transactions.length === 0) {
+        // 沒有資料，顯示上傳對話框
+        this.showUploadDialog.set(true);
+      }
+    });
+  }
+
+  // 關閉對話框
+  closeUploadDialog() {
+    this.showUploadDialog.set(false);
+  }
 
   // 切換到上個月
   prevMonth() {

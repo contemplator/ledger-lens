@@ -57,13 +57,22 @@ export class FileDropzone {
     this.isProcessing.set(true);
     try {
       const transactions = await this.csvParser.parse(file);
-      this.transactionService.setTransactions(transactions);
-      // 上傳成功後導向 Dashboard
-      this.router.navigate(['/dashboard']);
+      
+      // 儲存到後端
+      this.transactionService.saveTransactions(transactions).subscribe({
+        next: () => {
+          // 上傳成功後重新載入頁面或導向 Dashboard
+          window.location.reload();
+        },
+        error: (error) => {
+          console.error('儲存失敗', error);
+          alert('儲存失敗，請稍後再試');
+          this.isProcessing.set(false);
+        }
+      });
     } catch (error) {
       console.error('CSV 解析失敗', error);
       alert('檔案解析失敗，請確認格式是否正確');
-    } finally {
       this.isProcessing.set(false);
     }
   }
