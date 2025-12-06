@@ -41,11 +41,23 @@ export class Analysis {
   // Data State
   transactions = this.transactionService.transactions;
   
-  // YoY State
-  // Default to previous month
+  // MoM State - 預設為上個月（完整月份）
+  selectedMomDate = signal<Date>(dayjs().subtract(1, 'month').toDate());
+  
+  // YoY State - 預設為上個月（完整月份）
   selectedYoyDate = signal<Date>(dayjs().subtract(1, 'month').toDate());
 
   constructor() {
+    // Effect to trigger analysis when date changes in MoM view
+    effect(() => {
+      const view = this.currentView();
+      const date = this.selectedMomDate();
+      
+      if (view === 'mom' && date) {
+        this.analyzeMom();
+      }
+    });
+
     // Effect to trigger analysis when date changes in YoY view
     effect(() => {
       const view = this.currentView();
@@ -60,9 +72,9 @@ export class Analysis {
   // MoM Analysis Data
   momAnalysis = computed(() => {
     const all = this.transactions();
-    const now = dayjs();
-    const currentMonthStr = now.format('YYYYMM');
-    const lastMonthStr = now.subtract(1, 'month').format('YYYYMM');
+    const selectedDate = dayjs(this.selectedMomDate());
+    const currentMonthStr = selectedDate.format('YYYYMM');
+    const lastMonthStr = selectedDate.subtract(1, 'month').format('YYYYMM');
 
     // Filter transactions
     const currentMonthTxns = all.filter(t => t.date.startsWith(currentMonthStr) && t.type === '支');
@@ -77,8 +89,8 @@ export class Analysis {
     const percentChange = lastTotal === 0 ? (currentTotal > 0 ? 100 : 0) : ((diff / lastTotal) * 100);
 
     return {
-      currentMonthLabel: now.format('YYYY年MM月'),
-      lastMonthLabel: now.subtract(1, 'month').format('YYYY年MM月'),
+      currentMonthLabel: selectedDate.format('YYYY年MM月'),
+      lastMonthLabel: selectedDate.subtract(1, 'month').format('YYYY年MM月'),
       currentTotal,
       lastTotal,
       diff,
@@ -134,15 +146,23 @@ export class Analysis {
     };
   }
 
-  async onMomClick() {
+  onMomClick() {
     this.currentView.set('mom');
-    
+    // Analysis triggered by effect
+  }
+
+  onYoyClick() {
+    this.currentView.set('yoy');
+    // Analysis triggered by effect
+  }
+
+  async analyzeMom() {
     this.isLoading.set(true);
     this.analysisResult.set(null);
 
-    const now = dayjs();
-    const current = this.getMonthlySummary(now);
-    const previous = this.getMonthlySummary(now.subtract(1, 'month'));
+    const selectedDate = dayjs(this.selectedMomDate());
+    const current = this.getMonthlySummary(selectedDate);
+    const previous = this.getMonthlySummary(selectedDate.subtract(1, 'month'));
 
     try {
       const result = await this.geminiService.analyzeComparison(current, previous, 'MoM');
@@ -153,11 +173,6 @@ export class Analysis {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  onYoyClick() {
-    this.currentView.set('yoy');
-    // Analysis triggered by effect
   }
 
   async analyzeYoy() {
@@ -183,3 +198,4 @@ export class Analysis {
     this.currentView.set('menu');
   }
 }
+

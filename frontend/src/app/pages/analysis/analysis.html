@@ -62,13 +62,26 @@
   <!-- MoM Analysis View -->
   @if (currentView() === 'mom') {
     <div class="max-w-4xl mx-auto">
-      <button 
-        pButton 
-        icon="pi pi-arrow-left" 
-        label="返回選單" 
-        class="p-button-text mb-6"
-        (click)="onBackClick()"
-      ></button>
+      <div class="flex justify-between items-center mb-6">
+        <button 
+          pButton 
+          icon="pi pi-arrow-left" 
+          label="返回選單" 
+          class="p-button-text"
+          (click)="onBackClick()"
+        ></button>
+
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-700">選擇月份：</label>
+          <p-datepicker 
+            [(ngModel)]="selectedMomDate" 
+            view="month" 
+            dateFormat="yy/mm" 
+            [readonlyInput]="true"
+            [showIcon]="true">
+          </p-datepicker>
+        </div>
+      </div>
 
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -172,8 +185,7 @@
             view="month" 
             dateFormat="yy/mm" 
             [readonlyInput]="true"
-            [showIcon]="true"
-            styleClass="w-40">
+            [showIcon]="true">
           </p-datepicker>
         </div>
       </div>
