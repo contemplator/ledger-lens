@@ -56,15 +56,77 @@ LedgerLens 是一個現代化的財務記帳應用程式，旨在透過直觀的
    npm install --legacy-peer-deps
    ```
 
-### 執行專案
+## 啟動方式說明
 
-- **啟動開發伺服器**
-  ```bash
-  npm start
-  ```
-  伺服器啟動後，請開啟瀏覽器訪問 `http://localhost:4200`。
+### 前端（Angular）
 
-- **建置生產版本 (Production Build)**
-  ```bash
-  npm run build
+1. **Node.js 版本需求**：請使用 Node.js v22 以上
+2. 安裝依賴：
+   ```sh
+   cd frontend
+   npm install
+   ```
+3. 啟動開發伺服器：
+   ```sh
+   npm start
+   # 或
+   ng serve
+   ```
+
+### 後端（Go）
+
+1. 安裝依賴：
+   ```sh
+   cd backend
+   go mod tidy
+   ```
+2. 啟動伺服器：
+   ```sh
+   go run main.go
+   ```
+
+---
+
+## 資料庫 Migration 管理（golang-migrate）
+
+本專案使用 [`golang-migrate`](https://github.com/golang-migrate/migrate) 來管理 PostgreSQL schema 版本。
+
+### migration 檔案命名規則
+
+- 檔案放在 `db/migrations/` 目錄下
+- 命名格式為：
   ```
+  [順序]_[描述].up.sql
+  [順序]_[描述].down.sql
+  ```
+  其中 `[順序]` 建議使用 `YYYYMMDDhhmm` 的時間戳記，例如：
+  ```
+  202511221518_init_schema.up.sql
+  202511221518_init_schema.down.sql
+  ```
+  - `.up.sql`：升級（建立/修改資料表）
+  - `.down.sql`：降級（還原/刪除資料表）
+
+### 常用 migrate 指令
+
+**升級（執行所有 up migration）**
+```sh
+migrate -path db/migrations -database "postgresql://[user]:[password]@[host]:[port]/[database]?sslmode=disable" up
+```
+
+**降級（回滾一個 migration）**
+```sh
+migrate -path db/migrations -database "postgresql://[user]:[password]@[host]:[port]/[database]?sslmode=disable" down 1
+```
+
+**指定步數升級/降級**
+```sh
+# 升級 2 步
+migrate -path db/migrations -database "postgresql://[user]:[password]@[host]:[port]/[database]?sslmode=disable" up 2
+# 降級 2 步
+migrate -path db/migrations -database "postgresql://[user]:[password]@[host]:[port]/[database]?sslmode=disable" down 2
+```
+
+**更多用法請參考官方文件：** https://github.com/golang-migrate/migrate
+
+---
