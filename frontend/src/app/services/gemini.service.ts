@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { environment } from '../../environments/environment';
 import { MonthlySummary, Transaction } from '../models/transaction.model';
+import dayjs from 'dayjs';
 
 @Injectable({
   providedIn: 'root'
@@ -84,19 +85,17 @@ export class GeminiService {
     const uniqueCategories = Array.from(new Set(transactions.map(t => t.category))).slice(0, 50).join(', ');
     let dateContext = "";
     if (transactions.length > 0) {
-      // Parse dates from YYYYMMDD format
-      const dates = transactions.map(t => {
-        const d = t.date;
-        return new Date(`${d.substring(0, 4)}-${d.substring(4, 6)}-${d.substring(6, 8)}`).getTime();
-      });
-      const minDate = new Date(Math.min(...dates)).toISOString().split('T')[0];
-      const maxDate = new Date(Math.max(...dates)).toISOString().split('T')[0];
+      // Parse dates from YYYYMMDD format using dayjs
+      const dates = transactions.map(t => dayjs(t.date, 'YYYYMMDD'));
+      const sortedDates = dates.sort((a, b) => a.valueOf() - b.valueOf());
+      const minDate = sortedDates[0].format('YYYY-MM-DD');
+      const maxDate = sortedDates[sortedDates.length - 1].format('YYYY-MM-DD');
       dateContext = `Dataset Date Range: ${minDate} to ${maxDate}`;
     }
 
     const prompt = `
       Context:
-      - Today: ${new Date().toISOString().split('T')[0]}
+      - Today: ${dayjs().format('YYYY-MM-DD')}
       - ${dateContext}
       - Available Categories in DB: ${uniqueCategories}
       

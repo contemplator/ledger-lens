@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, computed, inject, signal, OnInit, effect } from '@angular/core';
 import { TransactionService } from '../../services/transaction.service';
 import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard implements OnInit {
+export class Dashboard {
   private transactionService = inject(TransactionService);
   
   // 上傳對話框顯示狀態
@@ -25,11 +25,10 @@ export class Dashboard implements OnInit {
   currentYear = signal(dayjs().year());
   currentMonth = signal(dayjs().month() + 1); // 1-12
 
-  ngOnInit() {
-    // 載入交易資料
-    this.transactionService.loadTransactions().subscribe(response => {
-      if (!response.transactions || response.transactions.length === 0) {
-        // 沒有資料，顯示上傳對話框
+  constructor() {
+    // 監聽資料載入完成後，如果沒有資料則顯示上傳對話框
+    effect(() => {
+      if (this.transactionService.isLoaded() && this.transactionService.transactions().length === 0) {
         this.showUploadDialog.set(true);
       }
     });

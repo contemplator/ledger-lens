@@ -21,6 +21,13 @@ export class TransactionService {
   readonly isLoading = signal<boolean>(false);
   readonly isLoaded = signal<boolean>(false);
 
+  constructor() {
+    // 如果已登入，自動載入交易資料
+    if (this.authService.isAuthenticated()) {
+      this.loadTransactions().subscribe();
+    }
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
