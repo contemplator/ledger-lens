@@ -22,12 +22,27 @@ ledger-lens/
 - **Language**: TypeScript (Strict mode).
 - **Date Handling**: Use **dayjs** for all date and time manipulations. Avoid using native `Date` object directly.
 
+### Backend (Go)
+- **Language**: Go (Latest version).
+- **Web Framework**: Gin.
+- **Database**: PostgreSQL.
+- **ORM**: GORM.
+- **Migrations**: golang-migrate.
+- **Architecture**: RESTful API.
+
 ## Technology Stack
 
 ### Core Framework
 - **Angular 21**: Latest version with standalone component architecture
 - **TypeScript 5.9**: Strict mode enabled with `noImplicitReturns` and `noFallthroughCasesInSwitch`
 - **RxJS 7.8**: Included but prefer signals for state management
+
+### Backend Stack
+- **Go**: Latest stable version.
+- **Gin**: Web framework for API development.
+- **GORM**: ORM library for database interactions.
+- **PostgreSQL**: Relational database.
+- **golang-migrate**: Database migration tool.
 
 ### UI Libraries
 - **PrimeNG 20.3**: Primary component library
