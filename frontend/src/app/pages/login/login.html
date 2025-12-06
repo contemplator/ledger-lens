@@ -1,0 +1,25 @@
+<div class="login-container">
+    <p-toast></p-toast>
+    <p-card header="Login" [style]="{ width: '400px' }">
+        <div class="flex flex-column gap-3">
+            <div class="flex flex-column gap-2">
+                <label htmlFor="email">Email</label>
+                <input pInputText id="email" [(ngModel)]="email" placeholder="Enter your email" />
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label htmlFor="password">Password</label>
+                <p-password id="password" [(ngModel)]="password" [feedback]="false" [toggleMask]="true"
+                    placeholder="Enter your password" [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}">
+                </p-password>
+            </div>
+
+            <p-button label="Login" [loading]="isLoading" (onClick)="onLogin()" styleClass="w-full"></p-button>
+
+            <div class="text-center mt-3">
+                <span>Don't have an account? </span>
+                <a routerLink="/register" class="text-primary no-underline hover:underline">Register</a>
+            </div>
+        </div>
+    </p-card>
+</div>

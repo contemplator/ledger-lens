@@ -4,6 +4,7 @@ import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
 import { AppConfig } from '../../services/app-config';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +14,11 @@ import { AppConfig } from '../../services/app-config';
 })
 export class Header implements OnInit {
   private configService = inject(AppConfig);
-  protected appName = this.configService.appName; 
+  private authService = inject(AuthService);
+  
+  protected appName = this.configService.appName;
+  protected isAuthenticated = this.authService.isAuthenticatedSignal;
+  
   items: MenuItem[] | undefined;
 
   ngOnInit() {
@@ -39,5 +44,9 @@ export class Header implements OnInit {
         routerLink: '/smart-search',
       },
     ];
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

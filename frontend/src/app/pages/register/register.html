@@ -1,0 +1,31 @@
+<div class="register-container">
+    <p-toast></p-toast>
+    <p-card header="LedgerLens Register" [style]="{ width: '400px' }">
+        <div class="flex flex-column gap-3">
+            <div class="flex flex-column gap-2">
+                <label htmlFor="email">Email *</label>
+                <input pInputText id="email" [(ngModel)]="email" placeholder="Enter your email" />
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label htmlFor="password">Password *</label>
+                <p-password id="password" [(ngModel)]="password" [toggleMask]="true" placeholder="Enter your password"
+                    [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}">
+                </p-password>
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label htmlFor="displayName">Display Name</label>
+                <input pInputText id="displayName" [(ngModel)]="displayName"
+                    placeholder="Enter your display name (optional)" />
+            </div>
+
+            <p-button label="Register" [loading]="isLoading" (onClick)="onRegister()" styleClass="w-full"></p-button>
+
+            <div class="text-center mt-3">
+                <span>Already have an account? </span>
+                <a routerLink="/login" class="text-primary no-underline hover:underline">Login</a>
+            </div>
+        </div>
+    </p-card>
+</div>

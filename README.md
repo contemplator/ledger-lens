@@ -99,13 +99,8 @@ LedgerLens 是一個現代化的財務記帳應用程式，旨在透過直觀的
   [順序]_[描述].up.sql
   [順序]_[描述].down.sql
   ```
-  其中 `[順序]` 建議使用 `YYYYMMDDhhmm` 的時間戳記，例如：
-  ```
-  202511221518_init_schema.up.sql
-  202511221518_init_schema.down.sql
-  ```
-  - `.up.sql`：升級（建立/修改資料表）
-  - `.down.sql`：降級（還原/刪除資料表）
+- `.up.sql`：升級（建立/修改資料表）
+- `.down.sql`：降級（還原/刪除資料表）
 
 ### 常用 migrate 指令
 
