@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Home } from './pages/home/home';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { TransactionList } from './pages/transaction-list/transaction-list';
 import { Analysis } from './pages/analysis/analysis';
@@ -15,7 +14,7 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     children: [
-      { path: '', component: Home }, // Or redirect to dashboard: redirectTo: 'dashboard', pathMatch: 'full'
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
       { path: 'transactions', component: TransactionList },
       { path: 'analysis', component: Analysis },
