@@ -90,7 +90,7 @@ jobs:
             # sudo cp -r /var/www/ledger-lens_temp/db/migrations/* /var/www/ledger-lens/db/migrations/
 
             # 3. 清理暫存
-            # rm -rf /var/www/ledger-lens_temp
+            rm -rf /var/www/ledger-lens_temp
 
             # 4. 執行 Database Migration (需先在 Server 安裝 migrate tool)
             # migrate -path /var/www/ledger-lens/db/migrations -database "postgres://..." up
