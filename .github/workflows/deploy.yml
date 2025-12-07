@@ -30,7 +30,7 @@ jobs:
           cd frontend/src/environments
           echo "export const environment = {" > environment.ts
           echo "  production: true," >> environment.ts
-          echo "  geminiApiKey: '${{ secrets.GEMINI_API_KEY }}'" >> environment.ts
+          echo "  geminiApiKey: '${{ secrets.GEMINI_API_KEY }}'," >> environment.ts
           echo "  apiBaseUrl: '/ledger-lens/api'" >> environment.ts
           echo "};" >> environment.ts
 
