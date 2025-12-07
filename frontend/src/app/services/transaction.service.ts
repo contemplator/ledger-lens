@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Transaction } from '../models/transaction.model';
 import { AuthService } from './auth.service';
 import { Observable, tap, catchError, of } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface TransactionsResponse {
   transactions: Transaction[];
@@ -12,7 +13,7 @@ interface TransactionsResponse {
   providedIn: 'root'
 })
 export class TransactionService {
-  private readonly apiUrl = '/api/transactions';
+  private readonly apiUrl = `${environment.apiBaseUrl}/transactions`;
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   
