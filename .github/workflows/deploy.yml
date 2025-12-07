@@ -82,9 +82,9 @@ jobs:
             sudo cp -r /var/www/ledger-lens_temp/frontend/dist/ledger-lens/* /var/www/ledger-lens/frontend/
 
             # Backend
-            # sudo cp /var/www/ledger-lens_temp/backend/server /var/www/ledger-lens/backend/
-            # sudo cp /var/www/ledger-lens_temp/backend/.env /var/www/ledger-lens/backend/
-            # sudo chmod +x /var/www/ledger-lens/backend/server
+            sudo cp /var/www/ledger-lens_temp/backend/server /var/www/ledger-lens/backend/
+            sudo cp /var/www/ledger-lens_temp/backend/.env /var/www/ledger-lens/backend/
+            sudo chmod +x /var/www/ledger-lens/backend/server
 
             # Migrations
             # sudo cp -r /var/www/ledger-lens_temp/db/migrations/* /var/www/ledger-lens/db/migrations/
@@ -96,5 +96,5 @@ jobs:
             # migrate -path /var/www/ledger-lens/db/migrations -database "postgres://..." up
 
             # 5. 重啟服務
-            # sudo systemctl start ledger-lens
-            # sudo systemctl restart nginx
+            sudo systemctl start ledger-lens
+            sudo systemctl restart nginx
