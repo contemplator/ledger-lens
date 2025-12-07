@@ -20,6 +20,8 @@ export class Dashboard {
   
   // 上傳對話框顯示狀態
   showUploadDialog = signal(false);
+  // 是否為首次上傳（無資料狀態）- 首次上傳時對話框不可關閉
+  isFirstUpload = signal(false);
   
   // 當前年份與月份 (預設為當前時間)
   currentYear = signal(dayjs().year());
@@ -29,6 +31,7 @@ export class Dashboard {
     // 監聽資料載入完成後，如果沒有資料則顯示上傳對話框
     effect(() => {
       if (this.transactionService.isLoaded() && this.transactionService.transactions().length === 0) {
+        this.isFirstUpload.set(true);
         this.showUploadDialog.set(true);
       }
     });
@@ -37,6 +40,12 @@ export class Dashboard {
   // 關閉對話框
   closeUploadDialog() {
     this.showUploadDialog.set(false);
+  }
+
+  // 開啟上傳對話框（重新上傳模式）
+  openUploadDialog() {
+    this.isFirstUpload.set(false);
+    this.showUploadDialog.set(true);
   }
 
   // 切換到上個月

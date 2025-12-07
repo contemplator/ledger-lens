@@ -1,15 +1,42 @@
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <div class="flex items-center justify-between mb-8">
-    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">總覽看板</h2>
-    <div class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-      <button (click)="prevMonth()" class="p-1 hover:bg-gray-100 rounded-full transition-colors mr-2 focus:outline-none" aria-label="上個月">
-        <i class="pi pi-chevron-left text-gray-600 text-sm"></i>
-      </button>
-      <i class="pi pi-calendar text-indigo-600 mr-2"></i>
-      <span class="text-lg font-semibold text-gray-700 min-w-24 text-center">{{ currentYear() }} 年 {{ currentMonth() }} 月</span>
-      <button (click)="nextMonth()" class="p-1 hover:bg-gray-100 rounded-full transition-colors ml-2 focus:outline-none" aria-label="下個月">
-        <i class="pi pi-chevron-right text-gray-600 text-sm"></i>
-      </button>
+    <h2
+      class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+    >
+      總覽看板
+    </h2>
+    <div class="flex items-center gap-3">
+      <button
+        pButton
+        icon="pi pi-upload"
+        label="重新上傳"
+        class="p-button-outlined p-button"
+        (click)="openUploadDialog()"
+      ></button>
+      <div class="flex items-center gap-3">
+        <div
+          class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200"
+        >
+          <button
+            (click)="prevMonth()"
+            class="p-1 hover:bg-gray-100 rounded-full transition-colors mr-2 focus:outline-none"
+            aria-label="上個月"
+          >
+            <i class="pi pi-chevron-left text-gray-600 text-sm"></i>
+          </button>
+          <i class="pi pi-calendar text-indigo-600 mr-2"></i>
+          <span class="text-lg font-semibold text-gray-700 min-w-24 text-center"
+            >{{ currentYear() }} 年 {{ currentMonth() }} 月</span
+          >
+          <button
+            (click)="nextMonth()"
+            class="p-1 hover:bg-gray-100 rounded-full transition-colors ml-2 focus:outline-none"
+            aria-label="下個月"
+          >
+            <i class="pi pi-chevron-right text-gray-600 text-sm"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -64,7 +91,11 @@
             <dl>
               <dt class="truncate text-sm font-medium text-gray-500">結餘</dt>
               <dd>
-                <div class="text-lg font-medium text-gray-900" [class.text-red-600]="balance() < 0" [class.text-green-600]="balance() >= 0">
+                <div
+                  class="text-lg font-medium text-gray-900"
+                  [class.text-red-600]="balance() < 0"
+                  [class.text-green-600]="balance() >= 0"
+                >
                   {{ balance() | number }}
                 </div>
               </dd>
@@ -119,18 +150,24 @@
 </div>
 
 <!-- 上傳交易資料對話框 -->
-<p-dialog 
-  header="上傳交易紀錄" 
-  [(visible)]="showUploadDialog" 
-  [modal]="true" 
-  [closable]="false"
-  [style]="{ width: '500px' }">
+<p-dialog
+  header="上傳交易紀錄"
+  [(visible)]="showUploadDialog"
+  [modal]="true"
+  [closable]="!isFirstUpload()"
+  [dismissableMask]="!isFirstUpload()"
+  [style]="{ width: '500px' }"
+>
   <div class="text-center mb-4">
-    <i class="pi pi-file-import text-6xl text-indigo-500 mb-4"></i>
+    <i class="pi pi-file-import text-indigo-500 mb-4" [style]="{ fontSize: '3rem' }"></i>
+    @if (isFirstUpload()) {
     <p class="text-gray-600 mb-4">
-      尚未上傳任何交易紀錄。<br>
+      尚未上傳任何交易紀錄。<br />
       請上傳您的 CSV 檔案以開始使用。
     </p>
+    } @else {
+    <p class="text-gray-600 mb-4">請上傳您的 CSV 檔案以取代現有資料。</p>
+    }
   </div>
   <app-file-dropzone></app-file-dropzone>
 </p-dialog>
