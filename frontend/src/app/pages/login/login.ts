@@ -23,11 +23,10 @@ import { MessageService } from 'primeng/api';
     InputTextModule,
     PasswordModule,
     ButtonModule,
-    ToastModule
+    ToastModule,
   ],
-  providers: [MessageService],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrl: './login.scss',
 })
 export class Login {
   email = '';
@@ -53,7 +52,7 @@ export class Login {
         this.isLoading = false;
         console.error('Login error', err);
         this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.error || 'Login failed' });
-      }
+      },
     });
   }
 }
