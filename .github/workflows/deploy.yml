@@ -23,7 +23,7 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd frontend
-          npm install --legacy-peer-deps
+          npm install
 
       - name: Generate Environment File
         run: |
