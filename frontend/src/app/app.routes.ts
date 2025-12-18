@@ -19,7 +19,11 @@ export const routes: Routes = [
       { path: 'transactions', component: TransactionList },
       { path: 'analysis', component: Analysis },
       { path: 'smart-search', component: SmartSearch },
-    ]
+      {
+        path: 'line-bind',
+        loadComponent: () => import('./pages/line-binding/line-binding').then((m) => m.LineBinding),
+      },
+    ],
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];

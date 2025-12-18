@@ -1,0 +1,40 @@
+<div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
+    <!-- Init / Loading -->
+    <div *ngIf="status() === 'init' || status() === 'binding'" class="flex flex-col items-center">
+      <i class="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4"></i>
+      <h2 class="text-xl font-bold text-gray-800">Processing...</h2>
+      <p class="text-gray-600 mt-2">Integrating with Line...</p>
+    </div>
+
+    <!-- Success -->
+    <div *ngIf="status() === 'success'" class="flex flex-col items-center">
+      <i class="pi pi-check-circle text-5xl text-green-500 mb-4"></i>
+      <h2 class="text-2xl font-bold text-gray-800">Success!</h2>
+      <p class="text-gray-600 mt-2">Line account bound successfully.</p>
+
+      <div
+        *ngIf="lineProfile() as profile"
+        class="mt-4 flex items-center justify-center gap-3 bg-gray-100 p-3 rounded-md w-full"
+      >
+        <img *ngIf="profile.picture" [src]="profile.picture" class="w-10 h-10 rounded-full" alt="Profile" />
+        <span class="font-medium">{{ profile.name }}</span>
+      </div>
+
+      <button
+        (click)="closeWindow()"
+        class="mt-6 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+      >
+        Close
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="status() === 'error'" class="flex flex-col items-center">
+      <i class="pi pi-times-circle text-5xl text-red-500 mb-4"></i>
+      <h2 class="text-2xl font-bold text-gray-800">Failed</h2>
+      <p class="text-red-500 mt-2">{{ errorMessage() }}</p>
+      <p class="text-gray-500 text-sm mt-4">Please try again or contact support.</p>
+    </div>
+  </div>
+</div>

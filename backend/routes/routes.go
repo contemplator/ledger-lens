@@ -20,6 +20,10 @@ func SetupRoutes(r *gin.Engine) {
 		{
 			protected.GET("/transactions", handlers.GetTransactions)
 			protected.POST("/transactions", handlers.SaveTransactions)
+			protected.POST("/line/bind", handlers.BindLineAccount)
 		}
+
+		// Line Webhook (Public but signature verified)
+		api.POST("/line/webhook", handlers.LineWebhook)
 	}
 }
