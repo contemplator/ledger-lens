@@ -5,7 +5,7 @@ import { MonthlySummary, Transaction } from '../models/transaction.model';
 import dayjs from 'dayjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GeminiService {
   private genAI: GoogleGenerativeAI;
@@ -19,15 +19,15 @@ export class GeminiService {
   }
 
   async analyzeComparison(
-    current: MonthlySummary, 
-    previous: MonthlySummary, 
-    periodType: 'MoM' | 'YoY'
+    current: MonthlySummary,
+    previous: MonthlySummary,
+    periodType: 'MoM' | 'YoY',
   ): Promise<string> {
     if (!this.checkApiKey()) {
-      return "API Key is missing. Please configure your environment.";
+      return 'API Key is missing. Please configure your environment.';
     }
 
-    const model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     const prompt = `
       You are a financial analyst. Compare the spending habits between two periods.
@@ -55,8 +55,8 @@ export class GeminiService {
       const response = await result.response;
       return response.text();
     } catch (error) {
-      console.error("AI Analysis Error:", error);
-      return "分析時發生錯誤，請檢查 API Key 或網路連線。";
+      console.error('AI Analysis Error:', error);
+      return '分析時發生錯誤，請檢查 API Key 或網路連線。';
     }
   }
 
@@ -64,9 +64,9 @@ export class GeminiService {
     if (!this.checkApiKey()) return {};
 
     const model = this.genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: 'gemini-2.0-flash',
       generationConfig: {
-        responseMimeType: "application/json",
+        responseMimeType: 'application/json',
         responseSchema: {
           type: SchemaType.OBJECT,
           properties: {
@@ -75,18 +75,20 @@ export class GeminiService {
             minAmount: { type: SchemaType.NUMBER },
             maxAmount: { type: SchemaType.NUMBER },
             startDate: { type: SchemaType.STRING },
-            endDate: { type: SchemaType.STRING }
-          }
-        }
-      }
+            endDate: { type: SchemaType.STRING },
+          },
+        },
+      },
     });
 
     // Extract context from transactions
-    const uniqueCategories = Array.from(new Set(transactions.map(t => t.category))).slice(0, 50).join(', ');
-    let dateContext = "";
+    const uniqueCategories = Array.from(new Set(transactions.map((t) => t.category)))
+      .slice(0, 50)
+      .join(', ');
+    let dateContext = '';
     if (transactions.length > 0) {
       // Parse dates from YYYYMMDD format using dayjs
-      const dates = transactions.map(t => dayjs(t.date, 'YYYYMMDD'));
+      const dates = transactions.map((t) => dayjs(t.date, 'YYYYMMDD'));
       const sortedDates = dates.sort((a, b) => a.valueOf() - b.valueOf());
       const minDate = sortedDates[0].format('YYYY-MM-DD');
       const maxDate = sortedDates[sortedDates.length - 1].format('YYYY-MM-DD');
@@ -127,18 +129,21 @@ export class GeminiService {
       const text = response.text();
       return text ? JSON.parse(text) : {};
     } catch (error) {
-      console.error("AI Search Error:", error);
+      console.error('AI Search Error:', error);
       return {};
     }
   }
 
   async analyzeSpendingContext(transactions: Transaction[], query: string): Promise<string> {
-    if (!this.checkApiKey()) return "無法連線至 AI 服務";
+    if (!this.checkApiKey()) return '無法連線至 AI 服務';
 
-    const model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Use a larger context window for Gemini 1.5 Flash
-    const simplified = transactions.slice(0, 1000).map(t => `${t.date}: ${t.category} - $${t.amount} (${t.note})`).join('\n');
+    const simplified = transactions
+      .slice(0, 1000)
+      .map((t) => `${t.date}: ${t.category} - $${t.amount} (${t.note})`)
+      .join('\n');
     const totalCount = transactions.length;
 
     const prompt = `
@@ -157,10 +162,10 @@ export class GeminiService {
     try {
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      return response.text() || "無回應";
+      return response.text() || '無回應';
     } catch (e) {
       console.error(e);
-      return "分析錯誤";
+      return '分析錯誤';
     }
   }
 }
