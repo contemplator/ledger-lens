@@ -11,6 +11,7 @@ import (
 
 	"ledger-lens/backend/database"
 	"ledger-lens/backend/models"
+	"ledger-lens/backend/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -101,6 +102,18 @@ func LineWebhook(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// 1. Read Body for Logging
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read request body"})
+		return
+	}
+	// Restore body
+	c.Request.Body = io.NopCloser(strings.NewReader(string(bodyBytes)))
+
+	// 2. Log Raw Request
+	utils.LogRequest("Line Webhook", bodyBytes)
 
 	events, err := bot.ParseRequest(c.Request)
 	if err != nil {
