@@ -74,7 +74,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             # 1. 停止後端服務
-            # sudo systemctl stop ledger-lens
+            sudo systemctl stop ledger-lens
 
             # 2. 移動檔案到正式目錄
             # Frontend
@@ -97,4 +97,4 @@ jobs:
 
             # 5. 重啟服務
             sudo systemctl start ledger-lens
-            sudo systemctl restart nginx
+            # sudo systemctl restart nginx
