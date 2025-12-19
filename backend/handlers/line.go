@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -300,14 +301,15 @@ func parseCSV(r io.Reader) ([]map[string]interface{}, error) {
 			key := mapHeader(h)
 			if key != "" {
 				if key == "amount" {
-					// Handle amount parsing if needed, but keeping as string is safer for now until Unmarshal logic in frontend is checked.
-					// The frontend uses Number(row['金額']), so backend can store string or number.
-					// JSON usually stores numbers as numbers.
-					// Let's try to convert to float64 for JSON number type
-					// For simplicity and safety against format issues (commas etc), let's keep as string first or clean it.
-					// But `TransactionInput` in `transaction.go` uses `map[string]interface{}`.
-					// Let's try to keep it compatible.
-					row[key] = record[i]
+					// Remove commas and convert to float
+					amountStr := strings.ReplaceAll(record[i], ",", "")
+					if val, err := strconv.ParseFloat(amountStr, 64); err == nil {
+						row[key] = val
+					} else {
+						// Fallback: log warning and store as 0 to avoid frontend NaN
+						utils.LogRequest("CSV Parse Warning", []byte(fmt.Sprintf("Failed to parse amount: %s", record[i])))
+						row[key] = 0.0
+					}
 				} else {
 					row[key] = record[i]
 				}
