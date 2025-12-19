@@ -44,6 +44,7 @@ export class TransactionService {
   // 從後端載入交易資料
   loadTransactions(): Observable<TransactionsResponse> {
     this.isLoading.set(true);
+    this.isLoaded.set(false);
     return this.http
       .get<TransactionsResponse>(this.apiUrl, {
         headers: this.getAuthHeaders(),
@@ -97,5 +98,6 @@ export class TransactionService {
 
   clearTransactions() {
     this.transactions.set([]);
+    this.isLoaded.set(false);
   }
 }
