@@ -4,5 +4,6 @@
 // geminiApiKey 請替換為你的實際 Gemini API 金鑰
 export const environment = {
   production: true,
-  geminiApiKey: 'YOUR_GEMINI_API_KEY'
+  geminiApiKey: 'YOUR_GEMINI_API_KEY',
+  apiBaseUrl: '/api',
 };

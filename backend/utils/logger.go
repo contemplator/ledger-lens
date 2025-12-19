@@ -8,7 +8,12 @@ import (
 
 // LogRequest dumps content to a log file
 func LogRequest(prefix string, content []byte) {
-	f, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logStats := os.Getenv("LOG_FILE_PATH")
+	if logStats == "" {
+		logStats = "app.log"
+	}
+
+	f, err := os.OpenFile(logStats, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Error opening log file:", err)
 		return
