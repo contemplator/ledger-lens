@@ -54,7 +54,7 @@ func (m *LineTokenManager) GetToken() (string, error) {
 	data.Set("client_id", channelID)
 	data.Set("client_secret", channelSecret)
 
-	resp, err := http.PostForm("https://api.line.me/oauth2/v2.1/token", data)
+	resp, err := http.PostForm("https://api.line.me/v2/oauth/accessToken", data)
 	if err != nil {
 		return "", err
 	}
