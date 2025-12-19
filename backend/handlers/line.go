@@ -214,7 +214,7 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 	// 1. Check if user exists
 	var user models.User
 	if err := database.DB.First(&user, "line_user_id = ?", lineUserID).Error; err != nil {
-		bot.ReplyMessage(replyToken, linebot.NewTextMessage("尚未綁定帳號，請先至網站進行綁定。")).Do()
+		bot.ReplyMessage(replyToken, linebot.NewTextMessage("尚未綁定帳號。請點擊以下連結進行綁定：\nhttps://www.hung.services/ledger-lens/line-bind")).Do()
 		return
 	}
 

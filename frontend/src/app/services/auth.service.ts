@@ -14,7 +14,7 @@ interface RegisterResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = environment.apiBaseUrl;
@@ -24,30 +24,31 @@ export class AuthService {
   // Signal to track auth state reactively
   isAuthenticatedSignal = signal<boolean>(this.isAuthenticated());
 
-  constructor() { }
+  constructor() {}
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
-      tap(response => {
+      tap((response) => {
         localStorage.setItem('token', response.token);
         this.isAuthenticatedSignal.set(true);
-        this.router.navigate(['/dashboard']);
-      })
+      }),
     );
   }
 
   register(email: string, password: string, displayName?: string): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, {
-      email,
-      password,
-      display_name: displayName
-    }).pipe(
-      tap(() => {
-        // After register, you might want to auto login or redirect to login.
-        // For now, let's redirect to login.
-        this.router.navigate(['/login']);
+    return this.http
+      .post<RegisterResponse>(`${this.apiUrl}/register`, {
+        email,
+        password,
+        display_name: displayName,
       })
-    );
+      .pipe(
+        tap(() => {
+          // After register, you might want to auto login or redirect to login.
+          // For now, let's redirect to login.
+          this.router.navigate(['/login']);
+        }),
+      );
   }
 
   logout(): void {

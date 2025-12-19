@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 // PrimeNG Imports
@@ -35,6 +35,8 @@ export class Login {
 
   private authService = inject(AuthService);
   private messageService = inject(MessageService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   onLogin() {
     if (!this.email || !this.password) {
@@ -46,7 +48,9 @@ export class Login {
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
         this.isLoading = false;
-        // Navigation handled in AuthService
+        // Check returnUrl
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.isLoading = false;
