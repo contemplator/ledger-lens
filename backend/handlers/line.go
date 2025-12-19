@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
+	"sync"
+	"time"
 
 	"ledger-lens/backend/database"
 	"ledger-lens/backend/models"
@@ -18,6 +21,64 @@ import (
 	"github.com/line/line-bot-sdk-go/v8/linebot"
 	"gorm.io/datatypes"
 )
+
+// LineTokenManager handles caching of the short-lived channel access token
+type LineTokenManager struct {
+	Token     string
+	ExpiresAt time.Time
+	Mutex     sync.Mutex
+}
+
+var tokenManager = &LineTokenManager{}
+
+// GetToken returns a valid channel access token, refreshing if necessary
+func (m *LineTokenManager) GetToken() (string, error) {
+	m.Mutex.Lock()
+	defer m.Mutex.Unlock()
+
+	// Return cached token if valid (buffer 5 minutes)
+	if m.Token != "" && time.Now().Add(5*time.Minute).Before(m.ExpiresAt) {
+		return m.Token, nil
+	}
+
+	// Fetch new token
+	channelID := os.Getenv("LINE_MESSAGING_CHANNEL_ID")
+	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
+
+	if channelID == "" || channelSecret == "" {
+		return "", fmt.Errorf("LINE_MESSAGING_CHANNEL_ID or LINE_CHANNEL_SECRET not set")
+	}
+
+	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
+	data.Set("client_id", channelID)
+	data.Set("client_secret", channelSecret)
+
+	resp, err := http.PostForm("https://api.line.me/oauth2/v2.1/token", data)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("failed to get token: %s", string(body))
+	}
+
+	var result struct {
+		AccessToken string `json:"access_token"`
+		ExpiresIn   int    `json:"expires_in"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	m.Token = result.AccessToken
+	m.ExpiresAt = time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
+
+	return m.Token, nil
+}
 
 // BindLineAccountRequest structure
 type BindLineAccountRequest struct {
@@ -95,7 +156,14 @@ func BindLineAccount(c *gin.Context) {
 // LineWebhook handles Line Bot events
 func LineWebhook(c *gin.Context) {
 	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
-	channelToken := os.Getenv("LINE_CHANNEL_ACCESS_TOKEN")
+
+	// Get dynamic token
+	channelToken, err := tokenManager.GetToken()
+	if err != nil {
+		utils.LogRequest("Token Error", []byte(err.Error()))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get Line Access Token"})
+		return
+	}
 
 	bot, err := linebot.New(channelSecret, channelToken)
 	if err != nil {
