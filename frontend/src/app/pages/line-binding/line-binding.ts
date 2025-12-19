@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { LineService } from '../../services/line.service';
 import liff from '@line/liff';
 
 @Component({
@@ -17,7 +17,7 @@ export class LineBinding implements OnInit {
   errorMessage = signal<string>('');
   lineProfile = signal<{ name: string; picture?: string } | null>(null);
 
-  private http = inject(HttpClient);
+  private lineService = inject(LineService);
   private router = inject(Router);
 
   private readonly liffId = (environment as any).liffId || '2008726993-1EwaEvfj';
@@ -54,7 +54,7 @@ export class LineBinding implements OnInit {
   }
 
   bindAccount(idToken: string) {
-    this.http.post<any>(`${environment.apiBaseUrl}/line/bind`, { id_token: idToken }).subscribe({
+    this.lineService.bindAccount(idToken).subscribe({
       next: (res) => {
         this.status.set('success');
       },

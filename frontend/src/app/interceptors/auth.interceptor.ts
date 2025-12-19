@@ -10,21 +10,30 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const messageService = inject(MessageService);
 
-  return next(req).pipe(
+  const token = authService.getToken();
+  let authReq = req;
+
+  if (token) {
+    authReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${token}`),
+    });
+  }
+
+  return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Handle 401 Unauthorized
       if (error.status === 401) {
         // Clear auth state
         authService.logout();
-        
+
         // Show message
         messageService.add({
           severity: 'error',
           summary: 'Session Expired',
-          detail: 'Your session has expired. Please login again.'
+          detail: 'Your session has expired. Please login again.',
         });
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
