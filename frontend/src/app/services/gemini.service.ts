@@ -64,7 +64,7 @@ export class GeminiService {
     if (!this.checkApiKey()) return {};
 
     const model = this.genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash-lite',
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -137,7 +137,7 @@ export class GeminiService {
   async analyzeSpendingContext(transactions: Transaction[], query: string): Promise<string> {
     if (!this.checkApiKey()) return '無法連線至 AI 服務';
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     // Use a larger context window for Gemini 1.5 Flash
     const simplified = transactions
