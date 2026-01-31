@@ -222,7 +222,8 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 	// 2. Download file
 	content, err := bot.GetMessageContent(message.ID).Do()
 	if err != nil {
-		bot.ReplyMessage(replyToken, linebot.NewTextMessage("讀取檔案失敗。")).Do()
+		utils.LogError("handleFileMessage: GetMessageContent failed", err)
+		bot.ReplyMessage(replyToken, linebot.NewTextMessage("讀取檔案失敗: "+err.Error())).Do()
 		return
 	}
 	defer content.Content.Close()
@@ -230,6 +231,7 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 	// 3. Parse CSV
 	transactions, err := parseCSV(content.Content)
 	if err != nil {
+		utils.LogError("handleFileMessage: parseCSV failed", err)
 		bot.ReplyMessage(replyToken, linebot.NewTextMessage("CSV 解析失敗: "+err.Error())).Do()
 		return
 	}
@@ -237,6 +239,7 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 	// 4. Save to file
 	filePath, err := storage.SaveTransactionFile(user.ID.String(), transactions)
 	if err != nil {
+		utils.LogError("handleFileMessage: SaveTransactionFile failed", err)
 		bot.ReplyMessage(replyToken, linebot.NewTextMessage("檔案儲存失敗: "+err.Error())).Do()
 		return
 	}
@@ -251,14 +254,16 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 			FilePath: filePath,
 		}
 		if err := database.DB.Create(&userTransaction).Error; err != nil {
-			bot.ReplyMessage(replyToken, linebot.NewTextMessage("儲存失敗。")).Do()
+			utils.LogError("handleFileMessage: DB Create failed", err)
+			bot.ReplyMessage(replyToken, linebot.NewTextMessage("儲存失敗: "+err.Error())).Do()
 			return
 		}
 	} else {
 		// Update
 		userTransaction.FilePath = filePath
 		if err := database.DB.Save(&userTransaction).Error; err != nil {
-			bot.ReplyMessage(replyToken, linebot.NewTextMessage("更新失敗。")).Do()
+			utils.LogError("handleFileMessage: DB Save failed", err)
+			bot.ReplyMessage(replyToken, linebot.NewTextMessage("更新失敗: "+err.Error())).Do()
 			return
 		}
 	}

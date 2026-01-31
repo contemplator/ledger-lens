@@ -6,6 +6,7 @@ import (
 	"ledger-lens/backend/database"
 	"ledger-lens/backend/models"
 	"ledger-lens/backend/storage"
+	"ledger-lens/backend/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -36,7 +37,8 @@ func GetTransactions(c *gin.Context) {
 
 	transactions, err := storage.ReadTransactionFile(userTransaction.FilePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read transactions file"})
+		utils.LogError("GetTransactions: ReadTransactionFile failed", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read transactions file: " + err.Error()})
 		return
 	}
 
@@ -56,7 +58,8 @@ func SaveTransactions(c *gin.Context) {
 	// 儲存到檔案
 	filePath, err := storage.SaveTransactionFile(userID.String(), input.Transactions)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transactions file"})
+		utils.LogError("SaveTransactions: SaveTransactionFile failed", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transactions file: " + err.Error()})
 		return
 	}
 
@@ -71,14 +74,16 @@ func SaveTransactions(c *gin.Context) {
 			FilePath: filePath,
 		}
 		if err := database.DB.Create(&userTransaction).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transaction record"})
+			utils.LogError("SaveTransactions: DB Create failed", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transaction record: " + err.Error()})
 			return
 		}
 	} else {
 		// Update existing record
 		userTransaction.FilePath = filePath
 		if err := database.DB.Save(&userTransaction).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update transaction record"})
+			utils.LogError("SaveTransactions: DB Save failed", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update transaction record: " + err.Error()})
 			return
 		}
 	}

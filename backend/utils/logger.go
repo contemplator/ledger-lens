@@ -27,3 +27,8 @@ func LogRequest(prefix string, content []byte) {
 		fmt.Println("Error writing to log file:", err)
 	}
 }
+
+// LogError logs an error with context information
+func LogError(context string, err error) {
+	LogRequest("ERROR: "+context, []byte(err.Error()))
+}
