@@ -15,12 +15,12 @@ import (
 
 	"ledger-lens/backend/database"
 	"ledger-lens/backend/models"
+	"ledger-lens/backend/storage"
 	"ledger-lens/backend/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/line/line-bot-sdk-go/v8/linebot"
-	"gorm.io/datatypes"
 )
 
 // LineTokenManager handles caching of the short-lived channel access token
@@ -234,20 +234,21 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 		return
 	}
 
-	// 4. Save (Override)
-	transactionsJSON, err := json.Marshal(transactions)
+	// 4. Save to file
+	filePath, err := storage.SaveTransactionFile(user.ID.String(), transactions)
 	if err != nil {
-		bot.ReplyMessage(replyToken, linebot.NewTextMessage("系統錯誤: JSON Marshal failed")).Do()
+		bot.ReplyMessage(replyToken, linebot.NewTextMessage("檔案儲存失敗: "+err.Error())).Do()
 		return
 	}
 
+	// 5. Update database with file path
 	var userTransaction models.UserTransaction
 	result := database.DB.Where("user_id = ?", user.ID).First(&userTransaction)
 	if result.Error != nil {
 		// Create
 		userTransaction = models.UserTransaction{
-			UserID:       user.ID,
-			Transactions: datatypes.JSON(transactionsJSON),
+			UserID:   user.ID,
+			FilePath: filePath,
 		}
 		if err := database.DB.Create(&userTransaction).Error; err != nil {
 			bot.ReplyMessage(replyToken, linebot.NewTextMessage("儲存失敗。")).Do()
@@ -255,7 +256,7 @@ func handleFileMessage(bot *linebot.Client, lineUserID string, message *linebot.
 		}
 	} else {
 		// Update
-		userTransaction.Transactions = datatypes.JSON(transactionsJSON)
+		userTransaction.FilePath = filePath
 		if err := database.DB.Save(&userTransaction).Error; err != nil {
 			bot.ReplyMessage(replyToken, linebot.NewTextMessage("更新失敗。")).Do()
 			return

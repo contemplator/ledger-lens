@@ -1,22 +1,21 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"ledger-lens/backend/database"
 	"ledger-lens/backend/models"
+	"ledger-lens/backend/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 )
 
 type TransactionInput struct {
 	Transactions []map[string]interface{} `json:"transactions" binding:"required"`
 }
 
-// GetTransactions retrieves the user's transactions
+// GetTransactions retrieves the user's transactions from JSON file
 func GetTransactions(c *gin.Context) {
 	userID := c.MustGet("user_id").(uuid.UUID)
 
@@ -29,17 +28,22 @@ func GetTransactions(c *gin.Context) {
 		return
 	}
 
-	// Parse JSONB to return as JSON array
-	var transactions []map[string]interface{}
-	if err := json.Unmarshal(userTransaction.Transactions, &transactions); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse transactions"})
+	// 從檔案讀取
+	if userTransaction.FilePath == "" {
+		c.JSON(http.StatusOK, gin.H{"transactions": []interface{}{}})
+		return
+	}
+
+	transactions, err := storage.ReadTransactionFile(userTransaction.FilePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read transactions file"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
 }
 
-// SaveTransactions saves or updates the user's transactions
+// SaveTransactions saves the user's transactions to JSON file
 func SaveTransactions(c *gin.Context) {
 	userID := c.MustGet("user_id").(uuid.UUID)
 
@@ -49,10 +53,10 @@ func SaveTransactions(c *gin.Context) {
 		return
 	}
 
-	// Convert to JSON bytes
-	transactionsJSON, err := json.Marshal(input.Transactions)
+	// 儲存到檔案
+	filePath, err := storage.SaveTransactionFile(userID.String(), input.Transactions)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal transactions"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transactions file"})
 		return
 	}
 
@@ -63,18 +67,18 @@ func SaveTransactions(c *gin.Context) {
 	if result.Error != nil {
 		// Create new record
 		userTransaction = models.UserTransaction{
-			UserID:       userID,
-			Transactions: datatypes.JSON(transactionsJSON),
+			UserID:   userID,
+			FilePath: filePath,
 		}
 		if err := database.DB.Create(&userTransaction).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transactions"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save transaction record"})
 			return
 		}
 	} else {
 		// Update existing record
-		userTransaction.Transactions = datatypes.JSON(transactionsJSON)
+		userTransaction.FilePath = filePath
 		if err := database.DB.Save(&userTransaction).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update transactions"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update transaction record"})
 			return
 		}
 	}

@@ -27,7 +27,7 @@ func TestParseCSV(t *testing.T) {
 	if t1["date"] != "2023-12-01" {
 		t.Errorf("Expected date 2023-12-01, got %v", t1["date"])
 	}
-	if t1["amount"] != "100" {
+	if t1["amount"] != 100.0 {
 		t.Errorf("Expected amount 100, got %v", t1["amount"])
 	}
 	if t1["type"] != "支" {

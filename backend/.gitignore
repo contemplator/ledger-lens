@@ -33,3 +33,6 @@ go.work.sum
 
 # Debug
 __debug_bin*
+
+# Local Uploads
+uploads/
